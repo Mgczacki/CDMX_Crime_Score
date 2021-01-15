@@ -144,7 +144,7 @@ def update_output(n_clicks):
     new_df = df
     try:
         parsed = urllib.parse.quote(input_query)
-        direc = 'https://maps.googleapis.com/maps/api/geocode/json?address='+parsed+'&key='+token_google
+        direc = 'https://maps.googleapis.com/maps/api/geocode/json?address='+parsed+',+Mexico+City&key='+token_google
         response = requests.get(direc)
         localizacion = json.loads(response.text)
         q = localizacion["results"][0]['geometry']['location']
