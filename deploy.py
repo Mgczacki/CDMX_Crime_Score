@@ -63,7 +63,7 @@ def transformacion_coordenadas(row):
 f = open("diccionario_fechas", "rb")
 diccionario_fechas = pickle.load(f)
 f.close()
-
+times_cleaned = 0
 def generate_score(coords):
     datos = []
     vecinos_cercanos = neighbors
@@ -113,6 +113,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
     html.P(id='placeholder'),
+    html.P(id='placeholder2'),
     html.H1(children='Mexico City Crime Score'),
     html.Div(children='''
         A simple model for predicting a location's crime score using the 10 nearest crimes in the month.
@@ -125,9 +126,16 @@ app.layout = html.Div(children=[
         id='example-graph',
         figure=fig
     ),
-    html.A(html.Button('Clean Map'),href='/')
+    html.Button('Clean Map', id='clean-order', n_clicks=0)
 ])
-
+# @app.callback(
+#     dash.dependencies.Output('placeholder2', 'hidden'),
+#     [dash.dependencies.Input('clean-order', 'value')]
+#     )
+# def update_query_text(_):
+#     global lista_direcciones 
+#     lista_direcciones = [[0.0, 0.0, 0.0, 0.0, ""], [0.0, 0.0, 1.0, 0.0, ""]]
+#     return True
 @app.callback(
     dash.dependencies.Output('placeholder', 'hidden'),
     [dash.dependencies.Input('input-on-submit', 'value')]
@@ -138,9 +146,16 @@ def update_query_text(inp):
     return True
 @app.callback(
     dash.dependencies.Output('example-graph', 'figure'),
-    [dash.dependencies.Input('submit-val', 'n_clicks')]
+    [dash.dependencies.Input('submit-val', 'n_clicks'),
+    dash.dependencies.Input('clean-order', 'n_clicks')]
     )
-def update_output(n_clicks):
+def update_output(n_clicks, n_clicks2):
+    global times_cleaned
+    if(n_clicks2 > times_cleaned):
+        times_cleaned += 1
+        global lista_direcciones 
+        lista_direcciones = [[0.0, 0.0, 0.0, 0.0, ""], [0.0, 0.0, 1.0, 0.0, ""]]
+        return generate_map(pd.DataFrame(lista_direcciones, columns = columnas))
     new_df = df
     try:
         parsed = urllib.parse.quote(input_query)
